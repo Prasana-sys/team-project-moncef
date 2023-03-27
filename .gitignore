@@ -4,5 +4,11 @@ bin/
 # ignore obj/debug files
 obj/
 
+# ignore .vscode files
+.vscode/
+
+# ignore .devcontainer files
+.devcontainer/
+
 # The "obj" folder is used to store temporary object files and other files used in order to create the final binary during the compilation process.
 # The "bin" folder is the output folder for complete binaries (assemblies).

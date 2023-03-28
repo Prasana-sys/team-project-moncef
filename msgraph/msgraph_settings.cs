@@ -10,8 +10,9 @@ public class Settings
     {
         // Load settings
         IConfiguration config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
             // appsettings.json is required
-            .AddJsonFile("msgraph_appsettings.json", optional: false)
+            .AddJsonFile("msgraph/msgraph_appsettings.json", optional: false)
             // appsettings.Development.json" is optional, values override appsettings.json
             .AddJsonFile($"appsettings.Development.json", optional: true)
             // User secrets are optional, values override both JSON files

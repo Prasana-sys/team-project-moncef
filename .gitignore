@@ -10,5 +10,8 @@ obj/
 # ignore .devcontainer files
 .devcontainer/
 
+# ignore .dockerignore file
+.dockerignore
+
 # The "obj" folder is used to store temporary object files and other files used in order to create the final binary during the compilation process.
 # The "bin" folder is the output folder for complete binaries (assemblies).

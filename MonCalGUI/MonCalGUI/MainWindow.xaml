@@ -6,74 +6,78 @@
         xmlns:local="clr-namespace:MonCalGUI"
         mc:Ignorable="d"
         Height="600" Width="920"
-        WindowStyle = "None"
-        ResizeMode = "NoResize"
-        Background = "Transparent"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="Transparent"
         AllowsTransparency="True">
 
-    <Border Background="#272537"
-            CornerRadius="20">
-        <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+    <Border Background="#272537" CornerRadius="20">
+        <Grid Height="600" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="137*"/>
+                <ColumnDefinition Width="583*"/>
+            </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="75"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
+
             <TextBlock Text="MonCal"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        Foreground="White"
                        FontSize="22"
-                       Margin="20,0,0,0"/>
-
+                       Margin="20,0,0,0" Height="29" Width="75"/>
 
             <StackPanel Grid.Row="1">
-
                 <RadioButton Content="New Event"
-                             Height ="50"
+                             Height="50"
                              Foreground="White"
                              FontSize="14"
                              Style="{StaticResource MenuButtonTheme}"/>
 
                 <RadioButton Content="Microsoft Account"
-                             Height ="50"
+                             Height="50"
                              Foreground="White"
                              FontSize="14"
                              Style="{StaticResource MenuButtonTheme}"/>
 
                 <RadioButton Content="Google Account"
-                             Height ="50"
+                             Height="50"
                              Foreground="White"
                              FontSize="14"
                              Style="{StaticResource MenuButtonTheme}"/>
 
                 <RadioButton Content="Add Calendars"
-                             Height ="50"
+                             Height="50"
                              Foreground="White"
                              FontSize="14"
                              Style="{StaticResource MenuButtonTheme}"/>
-                
 
             </StackPanel>
-            
-            <!--generic text box, to use later for event name-->
+            <RadioButton Content="Quick Event"
+                         Grid.Column="1"
+                         HorizontalAlignment="Left"
+                             Foreground="White"
+                             FontSize="14"
+                             Style="{StaticResource MenuButtonTheme}" Margin="0,12,0,13" Checked="RadioButton_Checked"/>
+            <!-- Name text box -->
             <TextBox Width="250"
                      Height="40"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
-                     Margin="5"
                      Grid.Column="1"
-                     Style="{StaticResource ModernTextBox}"/>
+                     Style="{StaticResource ModernTextBox}" Margin="123,0,0,0" Grid.ColumnSpan="2"/>
+            <!-- Name text box -->
+            <TextBox Width="250"
+                     Height="40"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Left"
+                     Grid.Column="2"
+                     Style="{StaticResource DateBox}" Margin="236,0,0,0"/>
 
         </Grid>
-
-
     </Border>
-
-
-
 </Window>

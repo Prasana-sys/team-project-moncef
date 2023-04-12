@@ -19,9 +19,9 @@ public class MSgraph
         //     });
         // }
 
-        public static void InitializeGraph (Settings settings)
+        public static async Task InitializeGraph (Settings settings)
         {
-            GraphHelper.InitializeGraphForUserAuth (settings);
+            await GraphHelper.InitializeGraphForUserAuth (settings);
         }
 
         // <GreetUserSnippet>

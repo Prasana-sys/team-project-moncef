@@ -4,7 +4,9 @@
       "tenantId": "common",
       "graphUserScopes": [
         "user.read",
-        "calendars.readwrite.shared"
-      ]
+        "calendars.readwrite.shared",
+        "offline_access"
+      ],
+      "apiUri": "http://localhost"
     }
   }

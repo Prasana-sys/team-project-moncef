@@ -41,7 +41,7 @@ namespace MonCal
                         var settings = Settings.LoadSettings();
 
                         // Initialize Graph
-                        MSgraph.InitializeGraph(settings);
+                        await MSgraph.InitializeGraph(settings);
 
                         await MSgraph.GreetUserAsync();
 

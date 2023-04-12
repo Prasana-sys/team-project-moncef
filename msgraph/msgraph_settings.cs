@@ -11,24 +11,24 @@ public class Settings
     public readonly static string CacheDir = MsalCacheHelper.UserRootDirectory;
     public const string Authority = "https://login.microsoftonline.com/common";
 
-    public static Settings LoadSettings()
-    {
-        // //Load settings
-        // IConfiguration config = new ConfigurationBuilder()
-        //     .SetBasePath(Directory.GetCurrentDirectory())
-        //     // appsettings.json is required
-        //     .AddJsonFile("msgraph/msgraph_appsettings.json", optional: false)
-        //     // appsettings.Development.json" is optional, values override appsettings.json
-        //     .AddJsonFile($"appsettings.Development.json", optional: true)
-        //     // User secrets are optional, values override both JSON files
-        //     .AddUserSecrets<MonCal.Program>()
-        //     .Build();
+    // public static Settings LoadSettings()
+    // {
+    //     // //Load settings
+    //     // IConfiguration config = new ConfigurationBuilder()
+    //     //     .SetBasePath(Directory.GetCurrentDirectory())
+    //     //     // appsettings.json is required
+    //     //     .AddJsonFile("msgraph/msgraph_appsettings.json", optional: false)
+    //     //     // appsettings.Development.json" is optional, values override appsettings.json
+    //     //     .AddJsonFile($"appsettings.Development.json", optional: true)
+    //     //     // User secrets are optional, values override both JSON files
+    //     //     .AddUserSecrets<MonCal.Program>()
+    //     //     .Build();
 
-        // return config.GetRequiredSection("Settings").Get<Settings>() ??
-        //     throw new Exception("Could not load app settings.");
+    //     // return config.GetRequiredSection("Settings").Get<Settings>() ??
+    //     //     throw new Exception("Could not load app settings.");
 
-        Settings _settings = new Settings();
-        return _settings;
+    //     Settings _settings = new Settings();
+    //     return _settings;
 
-    }
+    // }
 }

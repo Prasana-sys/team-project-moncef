@@ -2,15 +2,13 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using Microsoft.Graph.Me.SendMail;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Extensions.Msal;
 using System.Net.Http.Headers;
 
 class GraphHelper
 {
-    // Settings object
-    private static Settings? _settings;
+    // // Settings object
+    // private static Settings? _settings;
     
     // Client configured with user authentication
     private static GraphServiceClient? _userClient;
@@ -19,29 +17,21 @@ class GraphHelper
 
     private static HttpClient? httpClient;
 
-    public static async Task InitializeGraphForUserAuth (Settings settings)
+    public static async Task InitializeGraphForUserAuth (IPublicClientApplication app)
     {   
-        // string filePath = @"authRecord.json";
-
-        _settings = settings;
-
         #pragma warning disable 8600 // _settings will never be null
         string[] scopes = Settings.GraphUserScopes;
         #pragma warning restore 8600
 
-        var app = PublicClientApplicationBuilder
-                    .Create(Settings.ClientId)
-                    .WithTenantId(Settings.TenantId)
-                    .WithRedirectUri("urn:ietf:wg:oauth:2.0:oob")
-                    .Build();
         var accounts = await app.GetAccountsAsync();
         AuthenticationResult result;
 
         try
         {   
-            Console.WriteLine(accounts.First().Username);
+            //Console.WriteLine(accounts.First().Username);
             result = await app.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
                         .ExecuteAsync();
+
         }
         catch(MsalUiRequiredException authRequiredEx)
         {   
@@ -49,50 +39,12 @@ class GraphHelper
             //Console.WriteLine(authRequiredEx.InnerException.Message);
             result = await app.AcquireTokenInteractive(scopes)
                         .ExecuteAsync();
-
-            var storageProperties = new StorageCreationPropertiesBuilder(Settings.CacheFileName, Settings.CacheDir).Build();
-
-            #pragma warning disable 8604
-            IPublicClientApplication pca = PublicClientApplicationBuilder.Create(Settings.ClientId)
-                .WithAuthority(Settings.Authority)
-                .WithRedirectUri("urn:ietf:wg:oauth:2.0:oob")  // make sure to register this redirect URI for the interactive login 
-                .Build();
-            #pragma warning restore 8604
-
-            // This hooks up the cross-platform cache into MSAL
-            var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
-            cacheHelper.RegisterCache(pca.UserTokenCache);
         }
 
         // Succesfully creates a GraphServiceClient to use protected web API calls
         httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
         _userClient = new GraphServiceClient (httpClient);
-
-        // HttpResponseMessage response = await httpClient.GetAsync(_settings.apiUri);
-
-        // try
-        // {
-        //     // Read (deserialize from existing json file containing Authentication Record if it exists)
-        //     Exception ex = new Exception("test");
-        //     throw ex;
-
-        //     // using (FileStream fs = File.OpenRead(filePath))
-        //     // {
-        //     //     _authRecord = AuthenticationRecord.Deserialize (fs);
-        //     // }
-
-        //     // var token = _interactiveBrowserCredential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://graph.microsoft.com/.default" }));
-
-        //     // _userClient = new GraphServiceClient(_interactiveBrowserCredential, _settings.GraphUserScopes);
-
-        // }
-        // catch (Exception ex)
-        // {   
-        //     // Else interactively authenticate user via default web browser and store (serialize) auth record to json file
-
-        //     var innerException = ex.InnerException;
-        //     System.Diagnostics.Debug.WriteLine($"User not initialized previously: {innerException?.Message ?? ex.Message}");
 
         //     //_settings = settings;
 
@@ -120,31 +72,7 @@ class GraphHelper
 
         //     //Get graph client based on interactiveCredential and scope.
         //     _userClient = new GraphServiceClient(_interactiveBrowserCredential, settings.GraphUserScopes);
-
-        //     // _authRecord = await authRecordTask;
-            
-        //     // using (FileStream fs = File.Create(filePath))
-        //     // {
-        //     //     _authRecord.Serialize (fs);
-        //     // }
-
-        // }
     }
-
-    // public static async Task<string> GetUserTokenAsync()
-    // {
-    //     // Ensure credential isn't null
-    //     _ = _deviceCodeCredential ??
-    //         throw new System.NullReferenceException("Graph has not been initialized for user auth");
-
-    //     // Ensure scopes isn't null
-    //     _ = _settings?.GraphUserScopes ?? throw new System.ArgumentNullException("Argument 'scopes' cannot be null");
-
-    //     // Request token with given scopes
-    //     var context = new TokenRequestContext(_settings.GraphUserScopes);
-    //     var response = await _deviceCodeCredential.GetTokenAsync(context);
-    //     return response.Token;
-    // }
 
     public static Task<User?> GetUserAsync()
         {
@@ -189,10 +117,15 @@ class GraphHelper
                     IsReminderOn = isReminderOn,
                     ReminderMinutesBeforeStart = reminderMinutesBeforeStart
                 };
-            await _userClient.Me.Events.PostAsync(requestEvent, (requestConfiguration) => 
+            var result = await _userClient.Me.Events.PostAsync(requestEvent, (requestConfiguration) => 
             {
 	           requestConfiguration.Headers.Add("Prefer", "outlook.timezone=\"" + preferredTimeZone + "\"");
             });
+
+            Console.WriteLine("Event created succesfully");
+            #pragma warning disable 8602
+            Console.WriteLine("Event ID: " + result.Id);
+            #pragma warning restore 8602
     
         }
         catch(Exception ex)

@@ -8,6 +8,20 @@ namespace MonCal
         static async Task Main(string[] args)
         {   
             Console.WriteLine("Welcome to MonCal CLI");
+
+            /// <Set up for Outlook>
+            // Initializes app with client, tenant ID and redirect URI
+            var app = Microsoft.Identity.Client.PublicClientApplicationBuilder
+                    .Create(Settings.ClientId)
+                    .WithTenantId(Settings.TenantId)
+                    .WithRedirectUri("urn:ietf:wg:oauth:2.0:oob")
+                    .Build();
+            var storageProperties = new Microsoft.Identity.Client.Extensions.Msal.StorageCreationPropertiesBuilder(Settings.CacheFileName, Settings.CacheDir).Build();
+
+            // This hooks up the cross-platform cache into MSAL
+            var cacheHelper = await Microsoft.Identity.Client.Extensions.Msal.MsalCacheHelper.CreateAsync(storageProperties);
+            cacheHelper.RegisterCache(app.UserTokenCache);
+            /// <Finish set up for Outlook>
             
             int choice = -1;
 
@@ -38,10 +52,10 @@ namespace MonCal
                     case 1:
                         // Perform event creation for outlook
                         
-                        var settings = Settings.LoadSettings();
+                        // var settings = Settings.LoadSettings();
 
                         // Initialize Graph
-                        await MSgraph.InitializeGraph(settings);
+                        await MSgraph.InitializeGraph(app);
 
                         await MSgraph.GreetUserAsync();
 

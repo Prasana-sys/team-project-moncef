@@ -2,115 +2,79 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using Microsoft.Graph.Me.SendMail;
 using Microsoft.Identity.Client;
+using System.Net.Http.Headers;
 
 class GraphHelper
 {
-    // Settings object
-    private static Settings? _settings;
+    // // Settings object
+    // private static Settings? _settings;
     
     // Client configured with user authentication
     private static GraphServiceClient? _userClient;
     
-    private static InteractiveBrowserCredential? _interactiveBrowserCredential;
+    // private static InteractiveBrowserCredential? _interactiveBrowserCredential;
 
-    private static AuthenticationRecord? _authRecord;
+    private static HttpClient? httpClient;
 
-    public static void InitializeGraphForUserAuth (Settings settings)
+    public static async Task InitializeGraphForUserAuth (IPublicClientApplication app)
     {   
-        // string filePath = @"authRecord.json";
+        #pragma warning disable 8600 // _settings will never be null
+        string[] scopes = Settings.GraphUserScopes;
+        #pragma warning restore 8600
 
-        _settings = settings;
-
-        // var app = PublicClientApplicationBuilder.Create(_settings.ClientId).Build();
-        // var accounts = await app.GetAccountsAsync();
-        // AuthenticationResult result;
-        // try
-        // {
-        // result = await app.AcquireTokenSilent(_settings.GraphUserScopes, accounts.FirstOrDefault())
-        //             .ExecuteAsync();
-        // }
-        // catch(MsalUiRequiredException)
-        // {
-        // result = await app.AcquireTokenInteractive(_settings.GraphUserScopes)
-        //             .ExecuteAsync();
-        // }
+        var accounts = await app.GetAccountsAsync();
+        AuthenticationResult result;
 
         try
-        {
-            // Read (deserialize from existing json file containing Authentication Record if it exists)
-            Exception ex = new Exception("test");
-            throw ex;
-
-            // using (FileStream fs = File.OpenRead(filePath))
-            // {
-            //     _authRecord = AuthenticationRecord.Deserialize (fs);
-            // }
-
-            // var token = _interactiveBrowserCredential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://graph.microsoft.com/.default" }));
-
-            // _userClient = new GraphServiceClient(_interactiveBrowserCredential, _settings.GraphUserScopes);
-
-        }
-        catch (Exception ex)
         {   
-            // Else interactively authenticate user via default web browser and store (serialize) auth record to json file
-
-            var innerException = ex.InnerException;
-            System.Diagnostics.Debug.WriteLine($"User not initialized previously: {innerException?.Message ?? ex.Message}");
-
-            //_settings = settings;
-
-            var _interactiveBrowserCredentialOptions = new InteractiveBrowserCredentialOptions
-            {
-                ClientId = settings.ClientId,
-                TenantId = settings.TenantId,
-                // AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
-                DisableAutomaticAuthentication = false,
-                // MUST be http://localhost or http://localhost:PORT
-                // See https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/System-Browser-on-.Net-Core
-                // RedirectUri = new Uri("http://localhost"),
-            };
-
-            // https://docs.microsoft.com/dotnet/api/azure.identity.interactivebrowsercredential
-            _interactiveBrowserCredential = new InteractiveBrowserCredential(_interactiveBrowserCredentialOptions);
-            // Task<AuthenticationRecord> authRecordTask = _interactiveBrowserCredential.AuthenticateAsync ();
-
-            // //Get access token
-            // var token = _interactiveBrowserCredential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://graph.microsoft.com/.default" }));
-
-            // Console.WriteLine("Access token: " + token.Token);
-
-            // Console.WriteLine("Expires On: " + token.ExpiresOn);
-
-            //Get graph client based on interactiveCredential and scope.
-            _userClient = new GraphServiceClient(_interactiveBrowserCredential, settings.GraphUserScopes);
-
-            // _authRecord = await authRecordTask;
-            
-            // using (FileStream fs = File.Create(filePath))
-            // {
-            //     _authRecord.Serialize (fs);
-            // }
+            //Console.WriteLine(accounts.First().Username);
+            result = await app.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
+                        .ExecuteAsync();
 
         }
+        #pragma warning disable 0168
+        catch(MsalUiRequiredException authRequiredEx)
+        {   
+            // Console.WriteLine(authRequiredEx.Message);
+            // Console.WriteLine(authRequiredEx.InnerException.Message);
+            result = await app.AcquireTokenInteractive(scopes)
+                        .ExecuteAsync();
+        }
+        #pragma warning restore 0168
+
+        // Succesfully creates a GraphServiceClient to use protected web API calls
+        httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+        _userClient = new GraphServiceClient (httpClient);
+
+        //     //_settings = settings;
+
+        //     var _interactiveBrowserCredentialOptions = new InteractiveBrowserCredentialOptions
+        //     {
+        //         ClientId = settings.ClientId,
+        //         TenantId = settings.TenantId,
+        //         // AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+        //         DisableAutomaticAuthentication = false,
+        //         // MUST be http://localhost or http://localhost:PORT
+        //         // See https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/System-Browser-on-.Net-Core
+        //         // RedirectUri = new Uri("http://localhost"),
+        //     };
+
+        //     // https://docs.microsoft.com/dotnet/api/azure.identity.interactivebrowsercredential
+        //     _interactiveBrowserCredential = new InteractiveBrowserCredential(_interactiveBrowserCredentialOptions);
+        //     // Task<AuthenticationRecord> authRecordTask = _interactiveBrowserCredential.AuthenticateAsync ();
+
+        //     // //Get access token
+        //     // var token = _interactiveBrowserCredential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://graph.microsoft.com/.default" }));
+
+        //     // Console.WriteLine("Access token: " + token.Token);
+
+        //     // Console.WriteLine("Expires On: " + token.ExpiresOn);
+
+        //     //Get graph client based on interactiveCredential and scope.
+        //     _userClient = new GraphServiceClient(_interactiveBrowserCredential, settings.GraphUserScopes);
     }
-
-    // public static async Task<string> GetUserTokenAsync()
-    // {
-    //     // Ensure credential isn't null
-    //     _ = _deviceCodeCredential ??
-    //         throw new System.NullReferenceException("Graph has not been initialized for user auth");
-
-    //     // Ensure scopes isn't null
-    //     _ = _settings?.GraphUserScopes ?? throw new System.ArgumentNullException("Argument 'scopes' cannot be null");
-
-    //     // Request token with given scopes
-    //     var context = new TokenRequestContext(_settings.GraphUserScopes);
-    //     var response = await _deviceCodeCredential.GetTokenAsync(context);
-    //     return response.Token;
-    // }
 
     public static Task<User?> GetUserAsync()
         {
@@ -125,9 +89,9 @@ class GraphHelper
             });
         }
 
-    public async static Task CreateEvent(string subject, ItemBody body, DateTimeTimeZone start, DateTimeTimeZone end, 
-                                         Location location, List<Attendee> attendees, PatternedRecurrence recurrence, 
-                                         string preferredTimeZone, bool allowNewTimeProposals, bool isAllDay, bool isReminderOn, 
+    public async static Task CreateEvent(string subject, DateTimeTimeZone start, DateTimeTimeZone end, ItemBody body,
+                                         Location? location, List<Attendee>? attendees, PatternedRecurrence? recurrence, 
+                                         bool allowNewTimeProposals, bool isAllDay, bool isReminderOn, 
                                          Int32 reminderMinutesBeforeStart
                                         )
     {
@@ -155,17 +119,73 @@ class GraphHelper
                     IsReminderOn = isReminderOn,
                     ReminderMinutesBeforeStart = reminderMinutesBeforeStart
                 };
-            await _userClient.Me.Events.PostAsync(requestEvent, (requestConfiguration) => 
-            {
-	           requestConfiguration.Headers.Add("Prefer", "outlook.timezone=\"" + preferredTimeZone + "\"");
-            });
+            var result = await _userClient.Me.Events.PostAsync(requestEvent); //, (requestConfiguration) => 
+            // {
+	        //    requestConfiguration.Headers.Add("Prefer", "outlook.timezone=\"" + preferredTimeZone + "\"");
+            // });
+
+            //Console.WriteLine("Event created succesfully");
+            #pragma warning disable 8602
+            Console.WriteLine("Event ID: " + result.Id);
+            #pragma warning restore 8602
     
         }
-        catch(Exception ex)
+        catch(Microsoft.Graph.Models.ODataErrors.ODataError ex)
         {   
             var innerException = ex.InnerException;
-            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}");
+            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}, code: {ex?.Error?.Code}, message: {ex?.Error?.Message}");
         }
+    }
+
+    //Not for final use
+    public async static Task CreateCustomtestEventAsync(string subject, DateTimeTimeZone start, DateTimeTimeZone end)
+    {
+        // Ensure client isn't null
+            _ = _userClient ??
+                throw new System.NullReferenceException("Graph has not been initialized for user auth");
+
+        try
+        {
+            var requestEvent = new Event
+                {
+                    Subject = subject,
+                    Start = start,
+                    End = end
+                };
+            var result = await _userClient.Me.Events.PostAsync(requestEvent);
+
+            #pragma warning disable 8602
+            Console.WriteLine("Event ID: " + result.Id);
+            #pragma warning restore 8602
+        }
+        catch(Microsoft.Graph.Models.ODataErrors.ODataError ex)
+        {   
+            var innerException = ex.InnerException;
+            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}, code: {ex?.Error?.Code}, message: {ex?.Error?.Message}");
+        }
+    }
+
+    public async static Task deleteEvent(string eventID)
+    {
+        // Ensure client isn't null
+            _ = _userClient ??
+                throw new System.NullReferenceException("Graph has not been initialized for user auth");
+
+        // Ensure eventID is not null
+            _ = eventID ??
+                throw new System.NullReferenceException("Event ID is null");
+
+        await _userClient.Me.Events[eventID].DeleteAsync();
+    }
+
+    public async static Task<Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse> getSupportedTimeZones()
+    {
+        // Ensure client isn't null
+            _ = _userClient ??
+                throw new System.NullReferenceException("Graph has not been initialized for user auth");
+
+        var result = await _userClient.Me.Outlook.SupportedTimeZones.GetAsync();
+        return result ?? new Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse();
     }
 
 }

@@ -70,13 +70,13 @@
                      HorizontalAlignment="Left"
                      Grid.Column="1"
                      Style="{StaticResource ModernTextBox}" Margin="123,0,0,0" Grid.ColumnSpan="2"/>
-            <!-- Name text box -->
-            <TextBox Width="250"
+            <!-- Date text box -->
+            <!--<TextBox Width="250"
                      Height="40"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
                      Grid.Column="2"
-                     Style="{StaticResource DateBox}" Margin="236,0,0,0"/>
+                     Style="{StaticResource DateBox}" Margin="236,0,0,0"/>-->
 
         </Grid>
     </Border>

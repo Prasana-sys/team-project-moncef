@@ -1,0 +1,53 @@
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using System;
+using System.IO;
+using System.Threading;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Load the JSON key file for authentication
+        GoogleCredential credential;
+        using (var stream = new FileStream(@"credentials\google-calendar-api.json", FileMode.Open, FileAccess.Read))
+        {
+            credential = GoogleCredential.FromStream(stream)
+                .CreateScoped(CalendarService.Scope.Calendar);
+        }
+
+        // Create the calendar service
+        var service = new CalendarService(new BaseClientService.Initializer()
+        {
+            HttpClientInitializer = credential,
+            ApplicationName = "MyCalendarApp"
+        });
+
+        // Create a new event
+        var myEvent = new Event()
+        {
+            Summary = "My Event",
+            Location = "123 Main St, Anytown USA",
+            Start = new EventDateTime()
+            {
+                DateTime = new DateTime(2023, 04, 01, 10, 0, 0),
+                TimeZone = "America/New_York"
+            },
+            End = new EventDateTime()
+            {
+                DateTime = new DateTime(2023, 04, 01, 11, 0, 0),
+                TimeZone = "America/New_York"
+            }
+        };
+
+        // Add the event to the calendar
+        var calendarId = "primary"; // Use "primary" for the primary calendar of the authenticated user
+        var request = service.Events.Insert(myEvent, calendarId);
+        var createdEvent = request.Execute();
+
+        Console.WriteLine("Event created: {0}", createdEvent.HtmlLink);
+        Console.ReadLine();
+    }
+}

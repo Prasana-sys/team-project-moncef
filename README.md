@@ -9,9 +9,9 @@ MonCal is a **Centralized Calendar Management Desktop Application** that integra
 
 ```mermaid
 graph TD;
-    MonCal Calendar -->|uses| Microsoft Graph API;
-    MonCal Calendar -->|uses| Google Calendar API;
-    MonCal Calendar -->|has| CalendarGUI;
+    MonCal -->|uses| MicrosoftGraphAPI;
+    MonCal -->|uses| GoogleCalendarAPI;
+    MonCal -->|has| CalendarGUI;
  ```
     
 #####  Calendar Integration:

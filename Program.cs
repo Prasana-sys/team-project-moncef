@@ -1,5 +1,10 @@
 ﻿using System;
 using Microsoft.Graph.Models;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
 
 namespace MonCal
 {
@@ -48,27 +53,27 @@ namespace MonCal
                         Console.WriteLine ("Press 1 to add test event to calendar.");
 
                         if ("1" == Console.ReadLine())
-                        {   
+                        {
                             string test_subject = "Test";
                             var test_itemBody = new ItemBody
-                                {
-                                    ContentType = BodyType.Html,
-                                    Content = "This is a test.",
-                                };
+                            {
+                                ContentType = BodyType.Html,
+                                Content = "This is a test.",
+                            };
                             var test_start = new DateTimeTimeZone
-                                {
-                                    DateTime = "2023-03-30T12:30:00",
-                                    TimeZone = "Eastern Standard Time",
-                                };
+                            {
+                                DateTime = "2023-03-30T12:30:00",
+                                TimeZone = "Eastern Standard Time",
+                            };
                             var test_end = new DateTimeTimeZone
-                                {
-                                    DateTime = "2023-03-30T13:50:00",
-                                    TimeZone = "Eastern Standard Time",
-                                };
+                            {
+                                DateTime = "2023-03-30T13:50:00",
+                                TimeZone = "Eastern Standard Time",
+                            };
                             var test_Location = new Location
-                                {
-                                    DisplayName = "SWIFT 500",
-                                };
+                            {
+                                DisplayName = "SWIFT 500",
+                            };
                             var test_Attendees = new List<Attendee>
                                 {
                                     new Attendee
@@ -104,18 +109,62 @@ namespace MonCal
                             bool test_isAllDay = false;
                             bool test_isReminderOn = true;
                             Int32 test_reminderMinutesBeforeStart = 15;
-                            await MSgraph.CreateEventAsync(test_subject, test_itemBody, test_start, test_end, test_Location, 
-                                                            test_Attendees, test_Recurrence, test_prefferedTimeZone, test_AllowNewTimeProposals, 
+                            await MSgraph.CreateEventAsync(test_subject, test_itemBody, test_start, test_end, test_Location,
+                                                            test_Attendees, test_Recurrence, test_prefferedTimeZone, test_AllowNewTimeProposals,
                                                             test_isAllDay, test_isReminderOn, test_reminderMinutesBeforeStart
                                                         );
                         }
                         break;
+
                     case 2:
-                        // Perform event creation for google
-                        
+                        Console.WriteLine("Google Selected");
+                        UserCredential credential;
 
+                        // Load client secrets file
+                        using (var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                        {
+                            string credPath = "token.json";
+                            credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                                GoogleClientSecrets.FromStream(stream).Secrets,
+                                new[] { CalendarService.Scope.Calendar },
+                                "user",
+                                CancellationToken.None,
+                                new FileDataStore(credPath, true)).Result;
+                        }
 
+                        // Create Google Calendar API service
+                        var service = new CalendarService(new BaseClientService.Initializer()
+                        {
+                            HttpClientInitializer = credential,
+                            ApplicationName = "MonCal",
+                        });
+
+                        Console.WriteLine("Enter event name: ");
+                        string eventName = Console.ReadLine();
+                        Console.WriteLine("Enter event start time (yyyy-mm-dd hh:mm:ss): ");
+                        DateTime eventStart = DateTime.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter event end time (yyyy-mm-dd hh:mm:ss): ");
+                        DateTime eventEnd = DateTime.Parse(Console.ReadLine());
+
+                        // Create Google Calendar event
+                        var newEvent = new Google.Apis.Calendar.v3.Data.Event()
+                        {
+                            Summary = eventName,
+                            Start = new EventDateTime()
+                            {
+                                DateTime = eventStart,
+                                TimeZone = "America/New_York",
+                            },
+                            End = new EventDateTime()
+                            {
+                                DateTime = eventEnd,
+                                TimeZone = "America/New_York",
+                            },
+                        };
+                        newEvent = service.Events.Insert(newEvent, "primary").Execute();
+                        Console.WriteLine("Event created: {0} ({1})", newEvent.Summary, newEvent.Id);
                         break;
+
                 }
             }
         }

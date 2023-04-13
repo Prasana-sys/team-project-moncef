@@ -231,7 +231,7 @@ namespace MonCal
                                     if (endTimeResponse == "" || endTimeResponse == null)
                                     {
                                         Console.WriteLine("Empty or null, will use \"2023-04-13T13:50:00\"");
-                                        custom_end.DateTime = "2023-04-13T01:50:00";
+                                        custom_end.DateTime = "2023-04-13T13:50:00";
                                     }
                                     else
                                     {
@@ -241,6 +241,16 @@ namespace MonCal
                                     await GraphHelper.CreateCustomtestEventAsync(custom_subject, custom_start, custom_end);
                                     break;
                                 case 4:
+                                    //Delete Event
+                                    Console.WriteLine("Provide event ID of event to delete: ");
+                                    var delEventID = Console.ReadLine();
+                                    if (delEventID == null || delEventID == "")
+                                    {
+                                        Console.WriteLine("Event ID empty or null, aborting...");
+                                        break;
+                                    }
+                                    await MSgraph.DeleteEventAsync(delEventID);
+
                                     break;
                                 case 5:
                                     break;

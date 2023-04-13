@@ -18,4 +18,44 @@ obj/
 releases/
 
 # The "obj" folder is used to store temporary object files and other files used in order to create the final binary during the compilation process.
+<<<<<<< HEAD
 # The "bin" folder is the output folder for complete binaries (assemblies).
+
+# Visual Studio temporary files
+*.user
+*.suo
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.sbr
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.obj
+*.pdb
+*.ipch
+*.aps
+*.bin
+*.png
+*.bmp
+*.ico
+*.exe
+*.dll
+*.lib
+*.idb
+*.manifest
+*.res
+debug/
+release/
+x64/
+x86/
+Win32/
+=======
+# The "bin" folder is the output folder for complete binaries (assemblies).
+>>>>>>> 6da13141dd453bbc3d814b7f135b52a5e9b4cf08

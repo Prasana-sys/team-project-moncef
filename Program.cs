@@ -68,7 +68,7 @@ namespace MonCal
                             Console.WriteLine("2. Add pre-built test event to calendar");
                             Console.WriteLine("3. Add custom test event to calendar");
                             Console.WriteLine("4. Delete event on calendar");
-                            Console.WriteLine("5. Edit event on calendar");
+                            // Console.WriteLine("5. Edit event on calendar");
 
                             try
                             {

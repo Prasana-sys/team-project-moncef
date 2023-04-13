@@ -6,6 +6,7 @@ obj/
 
 # ignore .vscode files
 .vscode/
+.vs/
 
 # ignore .devcontainer files
 .devcontainer/

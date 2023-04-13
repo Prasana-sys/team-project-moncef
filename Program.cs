@@ -1,5 +1,10 @@
 ﻿using System;
 using Microsoft.Graph.Models;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
 
 namespace MonCal
 {
@@ -56,7 +61,7 @@ namespace MonCal
                         await MSgraph.InitializeGraph(app);
 
                         await MSgraph.GreetUserAsync();
-
+                        
                         int Outlookchoice = -1;
 
                         while (Outlookchoice != 0)
@@ -257,12 +262,56 @@ namespace MonCal
                             }
                         }
                         break;
+
                     case 2:
-                        // Perform event creation for google
-                        
+                        Console.WriteLine("Google Selected");
+                        UserCredential credential;
 
+                        // Load client secrets file
+                        using (var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                        {
+                            string credPath = "token.json";
+                            credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                                GoogleClientSecrets.FromStream(stream).Secrets,
+                                new[] { CalendarService.Scope.Calendar },
+                                "user",
+                                CancellationToken.None,
+                                new FileDataStore(credPath, true)).Result;
+                        }
 
+                        // Create Google Calendar API service
+                        var service = new CalendarService(new BaseClientService.Initializer()
+                        {
+                            HttpClientInitializer = credential,
+                            ApplicationName = "MonCal",
+                        });
+
+                        Console.WriteLine("Enter event name: ");
+                        string eventName = Console.ReadLine();
+                        Console.WriteLine("Enter event start time (yyyy-mm-dd hh:mm:ss): ");
+                        DateTime eventStart = DateTime.Parse(Console.ReadLine());
+                        Console.WriteLine("Enter event end time (yyyy-mm-dd hh:mm:ss): ");
+                        DateTime eventEnd = DateTime.Parse(Console.ReadLine());
+
+                        // Create Google Calendar event
+                        var newEvent = new Google.Apis.Calendar.v3.Data.Event()
+                        {
+                            Summary = eventName,
+                            Start = new EventDateTime()
+                            {
+                                DateTime = eventStart,
+                                TimeZone = "America/New_York",
+                            },
+                            End = new EventDateTime()
+                            {
+                                DateTime = eventEnd,
+                                TimeZone = "America/New_York",
+                            },
+                        };
+                        newEvent = service.Events.Insert(newEvent, "primary").Execute();
+                        Console.WriteLine("Event created: {0} ({1})", newEvent.Summary, newEvent.Id);
                         break;
+
                 }
             }
         }

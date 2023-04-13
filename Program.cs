@@ -50,9 +50,7 @@ namespace MonCal
                         Console.ReadLine();
                         break;
                     case 1:
-                        // Perform event creation for outlook
-                        
-                        // var settings = Settings.LoadSettings();
+                        Console.WriteLine("Outlook Selected");
 
                         // Initialize Graph
                         await MSgraph.InitializeGraph(app);
@@ -162,16 +160,85 @@ namespace MonCal
                                         },
                                     };
                                     var test_AllowNewTimeProposals = true;
-                                    string test_prefferedTimeZone = "Eastern Standard Time";
+                                    // string test_prefferedTimeZone = "Eastern Standard Time";
                                     bool test_isAllDay = false;
                                     bool test_isReminderOn = true;
                                     Int32 test_reminderMinutesBeforeStart = 15;
-                                    await MSgraph.CreateEventAsync(test_subject, test_itemBody, test_start, test_end, test_Location, 
-                                                                    test_Attendees, test_Recurrence, test_prefferedTimeZone, test_AllowNewTimeProposals, 
+                                    await MSgraph.CreateEventAsync(test_subject, test_start, test_end,  test_itemBody, test_Location, 
+                                                                    test_Attendees, test_Recurrence, test_AllowNewTimeProposals, 
                                                                     test_isAllDay, test_isReminderOn, test_reminderMinutesBeforeStart
                                                                 );
                                     break;
                                 case 3:
+                                    //create custom event
+                                    var custom_subject = "Untitled";
+                                    var custom_start = new DateTimeTimeZone
+                                        {
+                                            DateTime = "2023-04-13T12:30:00",
+                                            TimeZone = "Eastern Standard Time",
+                                        };
+                                    var custom_end = new DateTimeTimeZone
+                                        {
+                                            DateTime = "2023-04-13T13:50:00",
+                                            TimeZone = "Eastern Standard Time",
+                                        };
+
+                                    Console.WriteLine("Type in Event's name (Can leave empty, if left empty \"Test\" is default)");
+                                    custom_subject = Console.ReadLine() ?? "Test";
+                                    if (custom_subject == "") 
+                                        custom_subject = "Test";
+
+                                    Console.WriteLine("Type in time zone (Ex: \"Eastern Standard Time\", EST is default)");
+                                    var timeZoneResponse = Console.ReadLine();
+                                    var listSupportedTimeZones = await MSgraph.GetSupportedTimeZonesAsync(); // gets list of supported time zones on user's mailbox server
+                                    int timeZoneFlag = 0;
+                                    var emptyTimeZonesResponse = new Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse();
+                                    emptyTimeZonesResponse.Value = new List<TimeZoneInformation>();
+                                    foreach (var timeZone in listSupportedTimeZones.Value ?? emptyTimeZonesResponse.Value)
+                                    {
+                                        if (timeZone.Alias == timeZoneResponse){
+                                            timeZoneFlag = 1;
+                                            break;
+                                        }
+                                    }
+                                    if (timeZoneFlag == 0)
+                                    {
+                                        Console.WriteLine("Cannot recognize Time Zone, will use default value EST");
+                                        timeZoneResponse = "Eastern Standard Time";
+                                    }
+                                    custom_start.TimeZone = timeZoneResponse ?? "Eastern Standard Time";
+                                    custom_end.TimeZone = timeZoneResponse ?? "Eastern Standard Time";
+
+                                    Console.WriteLine("Type in start time (format: yyyy-mm-ddThh:mm:ss)");
+                                    var startTimeResponse = Console.ReadLine();
+                                    // var timeFormat = @"^\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}";
+                                    // if (System.Text.RegularExpressions.Regex.IsMatch(startTimeResponse, timeFormat))
+                                    // {
+
+                                    // }
+                                    if (startTimeResponse == "" || startTimeResponse == null)
+                                    {
+                                        Console.WriteLine("Empty or null, will use \"2023-04-13T12:30:00\"");
+                                        custom_start.DateTime = "2023-04-13T12:30:00";
+                                    }
+                                    else
+                                    {
+                                        custom_start.DateTime = startTimeResponse;
+                                    }
+
+                                    Console.WriteLine("Type in end time (format: yyyy-mm-ddThh:mm:ss)");
+                                    var endTimeResponse = Console.ReadLine();
+                                    if (endTimeResponse == "" || endTimeResponse == null)
+                                    {
+                                        Console.WriteLine("Empty or null, will use \"2023-04-13T13:50:00\"");
+                                        custom_end.DateTime = "2023-04-13T01:50:00";
+                                    }
+                                    else
+                                    {
+                                        custom_end.DateTime = endTimeResponse;
+                                    }
+                                    
+                                    await GraphHelper.CreateCustomtestEventAsync(custom_subject, custom_start, custom_end);
                                     break;
                                 case 4:
                                     break;

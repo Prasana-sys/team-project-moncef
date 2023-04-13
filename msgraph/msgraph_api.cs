@@ -28,33 +28,16 @@ public class MSgraph
             Console.WriteLine($"Error getting user: {ex.Message}");
         }
     }
-        // </GreetUserSnippet>
 
-        // // <DisplayAccessTokenSnippet>
-        // async Task DisplayAccessTokenAsync()
-        // {
-        //     try
-        //     {
-        //         var userToken = await GraphHelper.GetUserTokenAsync();
-        //         Console.WriteLine($"User token: {userToken}");
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Console.WriteLine($"Error getting user access token: {ex.Message}");
-        //     }
-        // }
-        // // </DisplayAccessTokenSnippet>
-
-    public static async Task CreateEventAsync(string subject, ItemBody body, DateTimeTimeZone start, DateTimeTimeZone end, 
-                                              Location location, List<Attendee> attendees, PatternedRecurrence recurrence, 
-                                              string preferredTimeZone, bool AllowNewTimeProposals, bool isAllDay, bool isReminderOn, 
-                                              Int32 reminderMinutesBeforeStart
+    public static async Task CreateEventAsync(string subject, DateTimeTimeZone start, DateTimeTimeZone end, ItemBody body, 
+                                              Location location, List<Attendee>? attendees, PatternedRecurrence? recurrence, 
+                                              bool AllowNewTimeProposals, bool isAllDay, 
+                                              bool isReminderOn, Int32 reminderMinutesBeforeStart
                                              )
     {   
         try
-        {
-            //var user = await GraphHelper.GetUserAsync();
-            await GraphHelper.CreateEvent(subject, body, start, end, location, attendees, recurrence, preferredTimeZone, AllowNewTimeProposals, 
+        {   
+            await GraphHelper.CreateEvent(subject, start, end, body, location, attendees, recurrence, AllowNewTimeProposals, 
                                           isAllDay, isReminderOn, reminderMinutesBeforeStart
                                          );
             Console.WriteLine("Event created.");
@@ -62,6 +45,34 @@ public class MSgraph
         catch(Exception ex)
         {
             Console.WriteLine($"Error creating event: {ex.Message}");
+        }
+    }
+
+    public static async Task DeleteEventAsync(string eventID)
+    {
+        try
+        {
+            await GraphHelper.deleteEvent(eventID);
+            Console.WriteLine("Event deleted.");
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error deleting event: {ex.Message}");
+        }
+    }
+
+    public static async Task<Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse> GetSupportedTimeZonesAsync ()
+    {
+        try
+        {
+            var result = await GraphHelper.getSupportedTimeZones();
+            return result;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error getting timezones: {ex.Message}");
+            var result = new Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse ();
+            return result;
         }
     }
 }

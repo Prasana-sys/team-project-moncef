@@ -33,13 +33,15 @@ class GraphHelper
                         .ExecuteAsync();
 
         }
+        #pragma warning disable 0168
         catch(MsalUiRequiredException authRequiredEx)
         {   
-            Console.WriteLine(authRequiredEx.Message);
-            //Console.WriteLine(authRequiredEx.InnerException.Message);
+            // Console.WriteLine(authRequiredEx.Message);
+            // Console.WriteLine(authRequiredEx.InnerException.Message);
             result = await app.AcquireTokenInteractive(scopes)
                         .ExecuteAsync();
         }
+        #pragma warning restore 0168
 
         // Succesfully creates a GraphServiceClient to use protected web API calls
         httpClient = new HttpClient();
@@ -87,9 +89,9 @@ class GraphHelper
             });
         }
 
-    public async static Task CreateEvent(string subject, ItemBody body, DateTimeTimeZone start, DateTimeTimeZone end, 
-                                         Location location, List<Attendee> attendees, PatternedRecurrence recurrence, 
-                                         string preferredTimeZone, bool allowNewTimeProposals, bool isAllDay, bool isReminderOn, 
+    public async static Task CreateEvent(string subject, DateTimeTimeZone start, DateTimeTimeZone end, ItemBody body,
+                                         Location? location, List<Attendee>? attendees, PatternedRecurrence? recurrence, 
+                                         bool allowNewTimeProposals, bool isAllDay, bool isReminderOn, 
                                          Int32 reminderMinutesBeforeStart
                                         )
     {
@@ -117,21 +119,49 @@ class GraphHelper
                     IsReminderOn = isReminderOn,
                     ReminderMinutesBeforeStart = reminderMinutesBeforeStart
                 };
-            var result = await _userClient.Me.Events.PostAsync(requestEvent, (requestConfiguration) => 
-            {
-	           requestConfiguration.Headers.Add("Prefer", "outlook.timezone=\"" + preferredTimeZone + "\"");
-            });
+            var result = await _userClient.Me.Events.PostAsync(requestEvent); //, (requestConfiguration) => 
+            // {
+	        //    requestConfiguration.Headers.Add("Prefer", "outlook.timezone=\"" + preferredTimeZone + "\"");
+            // });
 
-            Console.WriteLine("Event created succesfully");
+            //Console.WriteLine("Event created succesfully");
             #pragma warning disable 8602
             Console.WriteLine("Event ID: " + result.Id);
             #pragma warning restore 8602
     
         }
-        catch(Exception ex)
+        catch(Microsoft.Graph.Models.ODataErrors.ODataError ex)
         {   
             var innerException = ex.InnerException;
-            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}");
+            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}, code: {ex?.Error?.Code}, message: {ex?.Error?.Message}");
+        }
+    }
+
+    //Not for final use
+    public async static Task CreateCustomtestEventAsync(string subject, DateTimeTimeZone start, DateTimeTimeZone end)
+    {
+        // Ensure client isn't null
+            _ = _userClient ??
+                throw new System.NullReferenceException("Graph has not been initialized for user auth");
+
+        try
+        {
+            var requestEvent = new Event
+                {
+                    Subject = subject,
+                    Start = start,
+                    End = end
+                };
+            var result = await _userClient.Me.Events.PostAsync(requestEvent);
+
+            #pragma warning disable 8602
+            Console.WriteLine("Event ID: " + result.Id);
+            #pragma warning restore 8602
+        }
+        catch(Microsoft.Graph.Models.ODataErrors.ODataError ex)
+        {   
+            var innerException = ex.InnerException;
+            Console.WriteLine($"Error creating event: {innerException?.Message ?? ex.Message}, code: {ex?.Error?.Code}, message: {ex?.Error?.Message}");
         }
     }
 
@@ -143,9 +173,19 @@ class GraphHelper
 
         // Ensure eventID is not null
             _ = eventID ??
-                throw new System.NullReferenceException("New Event subject is null");
+                throw new System.NullReferenceException("Event ID is null");
 
         await _userClient.Me.Events[eventID].DeleteAsync();
+    }
+
+    public async static Task<Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse> getSupportedTimeZones()
+    {
+        // Ensure client isn't null
+            _ = _userClient ??
+                throw new System.NullReferenceException("Graph has not been initialized for user auth");
+
+        var result = await _userClient.Me.Outlook.SupportedTimeZones.GetAsync();
+        return result ?? new Microsoft.Graph.Me.Outlook.SupportedTimeZones.SupportedTimeZonesResponse();
     }
 
 }

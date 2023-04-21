@@ -8,11 +8,11 @@ obj/
 .vscode/
 .vs/
 
-# ignore .devcontainer files
-.devcontainer/
+# # ignore .devcontainer files
+# .devcontainer/
 
-# ignore .dockerignore file
-.dockerignore
+# # ignore .dockerignore file
+# .dockerignore
 
 # ignore releases file (Folder too big for GitHub)
 releases/

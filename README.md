@@ -1,6 +1,6 @@
 # MonCal
 ## _The Best calender, Ever_
-<img src="https://github.com/EECE3093C/team-project-moncef/blob/main/MonCal%20logo.png" width="150" height="112.50">
+<img src="https://github.com/EECE3093C/team-project-moncef/blob/main/docs/images/MonCal%20logo.png" width="150" height="112.50">
 
 MonCal is a **Centralized Calendar Management Desktop Application** that integrates with popular calendar platforms, such as Gmail, Outlook, and Apple, primarily developed for students in a college setting. The application will allow users to view all their calendar events in a centralized hub and create new events with advanced scheduling options, such as weekly repetition or custom recurrence patterns. Other competitors have desktop calendar applications which are clunky and have outdated interfaces.
 
@@ -15,11 +15,11 @@ graph TD;
  ```
     
 #####  Calendar Integration:
-![CalIntegration](https://github.com/EECE3093C/team-project-moncef/blob/main/docs/MonCal%20API%20Permissions.png)
-![Outlook Integration](https://github.com/EECE3093C/team-project-moncef/blob/main/docs/MSGraph_token_access.png)
+![CalIntegration](https://github.com/EECE3093C/team-project-moncef/blob/main/docs/images/MonCal%20API%20Permissions.png)
+![Outlook Integration](https://github.com/EECE3093C/team-project-moncef/blob/main/docs/images/MSGraph_token_access.png)
 
 ##### GUI:
-![v0.2.0 GUI](https://github.com/EECE3093C/team-project-moncef/blob/main/v0.2.0%20GUI.png)
+![v0.2.0 GUI](https://github.com/EECE3093C/team-project-moncef/blob/main/docs/images/v0.2.0%20GUI.png)
 
 
 

@@ -8,6 +8,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <DefaultItemExcludes>$(DefaultItemExcludes);MonCalGUI\**.pattern</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.8.2" />
@@ -20,6 +21,11 @@
     <PackageReference Include="Microsoft.Identity.Client" Version="4.52.0" />
     <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.52.0" />
     <PackageReference Include="Microsoft.Identity.Client.Desktop" Version="4.52.0" />
+    <Content Remove="MonCalGUI\**" />
+    <Compile Remove="MonCalGUI\**" />
+    <EmbeddedResource Remove="MonCalGUI\**" />
+    <None Remove="MonCalGUI\**" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
   </ItemGroup>
   <ItemGroup>
     <None Include="msgraph_appsettings*.json">

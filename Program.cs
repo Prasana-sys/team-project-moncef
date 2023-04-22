@@ -287,11 +287,11 @@ namespace MonCal
                         });
 
                         Console.WriteLine("Enter event name: ");
-                        string eventName = Console.ReadLine();
+                        string? eventName = Console.ReadLine();
                         Console.WriteLine("Enter event start time (yyyy-mm-dd hh:mm:ss): ");
-                        DateTime eventStart = DateTime.Parse(Console.ReadLine());
+                        DateTime eventStart = DateTime.Parse(Console.ReadLine() ?? "1990-01-01 00:00:00");
                         Console.WriteLine("Enter event end time (yyyy-mm-dd hh:mm:ss): ");
-                        DateTime eventEnd = DateTime.Parse(Console.ReadLine());
+                        DateTime eventEnd = DateTime.Parse(Console.ReadLine() ?? "1990-01-01 01:00:00");
 
                         // Create Google Calendar event
                         var newEvent = new Google.Apis.Calendar.v3.Data.Event()

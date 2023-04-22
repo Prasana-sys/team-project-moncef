@@ -19,7 +19,7 @@ Systematically attempt to get a token from the token cache by calling AcquireTok
 If this call fails, use the AcquireToken flow that you want to use, which is represented here by AcquireTokenInteractive.
 
 -Snipped in C#:
-
+```
     string[] scopes = new string[] {"user.read"};
     var app = PublicClientApplicationBuilder.Create(clientId).Build();
     var accounts = await app.GetAccountsAsync();
@@ -34,6 +34,7 @@ If this call fails, use the AcquireToken flow that you want to use, which is rep
     result = await app.AcquireTokenInteractive(scopes)
                 .ExecuteAsync();
     }
+```
 
 -Documentation to use for Microsoft Graph REST API v1.0:
 
